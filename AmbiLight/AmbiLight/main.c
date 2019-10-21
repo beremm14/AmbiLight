@@ -12,6 +12,8 @@ uint8_t led4 = PB4;
 uint8_t taster = PD2;
 uint8_t out = PD3;
 
+uint8_t pwm = OCR2B;
+
 enum States {
     OFF,
     ON,
@@ -27,6 +29,12 @@ void initIO(void) {
     DDRB |= (1<<led_active | 1<<led1 | 1<<led2 | 1<<led3 | 1<<led4);
     DDRD |= (1<<out);
     PORTD |= (1<<taster);
+    
+    OCR2B = 0;
+    TCCR2A |= (1 << COM0A1);
+    TCCR2A |= (1 << WGM01) | (1 << WGM00);
+    TCCR2B |= (1 << CS01);
+    
     state = OFF;
 }
 
