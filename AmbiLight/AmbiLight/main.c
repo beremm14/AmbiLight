@@ -14,6 +14,8 @@ uint8_t out = PD3;
 
 uint8_t pwm = OCR2B;
 
+uint32_t time = 0;
+
 enum States {
     OFF,
     ON,
@@ -25,6 +27,8 @@ enum States {
 
 enum States state;
 
+uint8_t switchPressed = 0;
+
 void initIO(void) {
     DDRB |= (1<<led_active | 1<<led1 | 1<<led2 | 1<<led3 | 1<<led4);
     DDRD |= (1<<out);
@@ -35,27 +39,81 @@ void initIO(void) {
     TCCR2A |= (1 << WGM01) | (1 << WGM00);
     TCCR2B |= (1 << CS01);
     
+    TCCR0 = (1<<CS01); //Prescaler 8
+    TIMSK &= ~(1<<TOIE0);
+    
+    EIMSK |= (1<<INT0);
+    EICRA |= (1<<ISC01);
+    
     state = OFF;
+    
+    sei();
 }
 
 int main(void) {
 	initIO();
 
 	while (1) {
+        if ((PIND & (1<<PIND2)) == 0) {
+            switchPressed = 1;
+            TIMSK |= (1<<TOIE0);
+            
+        } else {
+            switchPressed = 0;
+            TIMSK &= ~(1<<TOIE0);
+        }
+        
+        if (time <= 1000 && time >= 50 && switchPressed == 0) { //under 2sec
+            if (state == ON)
+                state = T1;
+            else if (state == T1)
+                state = T2;
+            else if (state == T2)
+                state = T3;
+            else if (state == T3)
+                state = T4;
+            else if (state == T4)
+                state = OFF;
+        } else if (time >= 1000 && switchPressed == 1) {
+            if (state != OFF && OCR2B > 0)
+                OCR2B--;
+        }
+        
         switch (state) {
             case OFF:
-                
+                PORTB &= ~(1<<led_active | 1<<led1 | 1<<led2 | 1<<led3 | 1<<led4);
+                OCR2B = 0;
+                break;
             case ON:
-                
+                PORTB |= (1<<led_active);
+                OCR2B = 256;
+                break;
             case T1:
-                
+                PORTB |= (1<<led1);
+                OCR2B = 256;
+                break;
             case T2:
-                
+                PORTB |= (1<led2);
+                OCR2B = 256;
+                break;
             case T3:
-                
+                PORTB |= (1<<led3);
+                OCR2B = 256;
+                break;
             case T4:
-                
+                PORTB |= (1<<led4);
+                OCR2B = 256;
+                break;
+        }
+        
+        if (switchPressed == 0) {
+            time = 0;
         }
 	}
 	return 0; // never reached
+}
+
+ISR(TIMER0_OVF_vect) {
+    //all 2ms
+    time++;
 }
