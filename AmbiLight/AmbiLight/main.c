@@ -12,8 +12,6 @@ uint8_t led4 = PB4;
 uint8_t taster = PD2;
 uint8_t out = PD3;
 
-uint8_t pwm = OCR2B;
-
 uint32_t time = 0;
 uint32_t time_off = 0;
 
@@ -40,8 +38,8 @@ void initIO(void) {
     TCCR2A |= (1 << WGM01) | (1 << WGM00);
     TCCR2B |= (1 << CS01);
     
-    TCCR0 = (1<<CS01); //Prescaler 8
-    TIMSK |= (1<<TOIE0);
+    TCCR0A = (1<<CS01); //Prescaler 8
+    TIMSK0 |= (1<<TOIE0);
     
     EIMSK |= (1<<INT0);
     EICRA |= (1<<ISC01);
@@ -88,7 +86,7 @@ int main(void) {
             case ON:
                 PORTB |= (1<<led_active);
                 if (OCR2B == 0)
-                    OCR2B = 256;
+                    OCR2B = 255;
                 time_off = 0;
                 break;
             case T1:
@@ -129,7 +127,7 @@ ISR(TIMER0_OVF_vect) {
     if (switchPressed)
         time++;
     
-    if (state == T1 | state == T2 | state == T3 | state == T4)
+    if (state == T1 || state == T2 || state == T3 || state == T4)
         time_off++;
     
 }
