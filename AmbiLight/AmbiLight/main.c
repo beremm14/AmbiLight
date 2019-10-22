@@ -44,73 +44,79 @@ int main(void) {
 	initIO();
 
 	while (1) {
-        if ((PIND & (1<<PIND2)) == 0) {
-            switchPressed = 0;
-        } else {
-            switchPressed = 1;
-        }
-        
-        if (time <= 1000 && time >= 50 && switchPressed == 0) { //under 2sec
-            if (state == ON)
-                state = T1;
-            else if (state == T1)
-                state = T2;
-            else if (state == T2)
-                state = T3;
-            else if (state == T3)
-                state = T4;
-            else if (state == T4)
-                state = OFF;
-            else if (state == OFF)
-                state = ON;
-        } else if (time >= 1000 && switchPressed == 1) {
-            if (state != OFF && (time % 50) == 0)
-                OCR2B--;
-        }
-        
-        switch (state) {
-            case OFF:
-                PORTB &= ~(1<<PB0 | 1<<PB1 | 1<<PB2 | 1<<PB3 | 1<<PB4);
-                OCR2B = 0;
-                time_off = 0;
-                break;
-            case ON:
-                PORTB |= (1<<PB0);
-                if (OCR2B == 0)
-                    OCR2B = 255;
-                time_off = 0;
-                break;
-            case T1:
-                PORTB |= (1<<PB1);
-                if (time_off > 1800000) {
-                    state = OFF;
-                }
-                break;
-            case T2:
-                PORTB |= (1<<PB2);
-                if (time_off > 3600000) {
-                    state = OFF;
-                }
-                break;
-            case T3:
-                PORTB |= (1<<PB3);
-                if (time_off > 5400000) {
-                    state = OFF;
-                }
-                break;
-            case T4:
-                PORTB |= (1<<PB4);
-                if (time_off > 7200000) {
-                    state = OFF;
-                }
-                break;
-        }
-        
-        if (switchPressed == 0) {
-            time = 0;
-        }
+        //run();
+        test1();
+        //test2();
 	}
 	return 0; // never reached
+}
+
+void run() {
+    if ((PIND & (1<<PIND2)) == 0) {
+        switchPressed = 0;
+    } else {
+        switchPressed = 1;
+    }
+    
+    if (time <= 1000 && time >= 50 && switchPressed == 0) { //under 2sec
+        if (state == ON)
+            state = T1;
+        else if (state == T1)
+            state = T2;
+        else if (state == T2)
+            state = T3;
+        else if (state == T3)
+            state = T4;
+        else if (state == T4)
+            state = OFF;
+        else if (state == OFF)
+            state = ON;
+    } else if (time >= 1000 && switchPressed == 1) {
+        if (state != OFF && (time % 50) == 0)
+            OCR2B--;
+    }
+    
+    switch (state) {
+        case OFF:
+            PORTB &= ~(1<<PB0 | 1<<PB1 | 1<<PB2 | 1<<PB3 | 1<<PB4);
+            OCR2B = 0;
+            time_off = 0;
+            break;
+        case ON:
+            PORTB |= (1<<PB0);
+            if (OCR2B == 0)
+                OCR2B = 255;
+            time_off = 0;
+            break;
+        case T1:
+            PORTB |= (1<<PB1);
+            if (time_off > 1800000) {
+                state = OFF;
+            }
+            break;
+        case T2:
+            PORTB |= (1<<PB2);
+            if (time_off > 3600000) {
+                state = OFF;
+            }
+            break;
+        case T3:
+            PORTB |= (1<<PB3);
+            if (time_off > 5400000) {
+                state = OFF;
+            }
+            break;
+        case T4:
+            PORTB |= (1<<PB4);
+            if (time_off > 7200000) {
+                state = OFF;
+            }
+            break;
+    }
+    
+    if (switchPressed == 0) {
+        time = 0;
+    }
 }
 
 ISR(TIMER0_OVF_vect) {
@@ -120,5 +126,37 @@ ISR(TIMER0_OVF_vect) {
     
     if (state == T1 || state == T2 || state == T3 || state == T4)
         time_off++;
+    
+}
+
+void test1() {
+    PORTB |= (1<<PB0 | 1<<PB1 | 1<<PB2 | 1<<PB3 | 1<<PB4);
+    OCR2B = 255;
+    while(1);
+}
+
+void test2() {
+    PORTB &= ~(1<<PB4);
+    PORTB |= (1<<PB0);
+    _delay_ms(500);
+    
+    PORTB &= ~(1<<PB0);
+    PORTB |= (1<<PB1);
+    _delay_ms(500);
+    
+    PORTB &= ~(1<<PB1);
+    PORTB |= (1<<PB2);
+    _delay_ms(500);
+    
+    PORTB &= ~(1<<PB2);
+    PORTB |= (1<<PB3);
+    _delay_ms(500);
+    
+    PORTB &= ~(1<<PB3);
+    PORTB |= (1<<PB4);
+    _delay_ms(500);
+}
+
+void test3() {
     
 }
