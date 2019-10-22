@@ -54,9 +54,9 @@ int main(void) {
 
 	while (1) {
         if ((PIND & (1<<PIND2)) == 0) {
-            switchPressed = 1;
-        } else {
             switchPressed = 0;
+        } else {
+            switchPressed = 1;
         }
         
         if (time <= 1000 && time >= 50 && switchPressed == 0) { //under 2sec

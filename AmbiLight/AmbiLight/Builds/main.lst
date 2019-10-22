@@ -776,25 +776,25 @@
  820               	.global __do_clear_bss
 DEFINED SYMBOLS
                             *ABS*:00000000 main.c
-/var/folders/n0/nrv0hhms1cx0j69_hx06fj7r0000gn/T//ccXYHPKB.s:2      *ABS*:0000003e __SP_H__
-/var/folders/n0/nrv0hhms1cx0j69_hx06fj7r0000gn/T//ccXYHPKB.s:3      *ABS*:0000003d __SP_L__
-/var/folders/n0/nrv0hhms1cx0j69_hx06fj7r0000gn/T//ccXYHPKB.s:4      *ABS*:0000003f __SREG__
-/var/folders/n0/nrv0hhms1cx0j69_hx06fj7r0000gn/T//ccXYHPKB.s:5      *ABS*:00000000 __tmp_reg__
-/var/folders/n0/nrv0hhms1cx0j69_hx06fj7r0000gn/T//ccXYHPKB.s:6      *ABS*:00000001 __zero_reg__
-/var/folders/n0/nrv0hhms1cx0j69_hx06fj7r0000gn/T//ccXYHPKB.s:113    .text:00000000 initIO
-/var/folders/n0/nrv0hhms1cx0j69_hx06fj7r0000gn/T//ccXYHPKB.s:802    .bss:00000009 led_active
-/var/folders/n0/nrv0hhms1cx0j69_hx06fj7r0000gn/T//ccXYHPKB.s:796    .data:00000005 led1
-/var/folders/n0/nrv0hhms1cx0j69_hx06fj7r0000gn/T//ccXYHPKB.s:791    .data:00000004 led2
-/var/folders/n0/nrv0hhms1cx0j69_hx06fj7r0000gn/T//ccXYHPKB.s:786    .data:00000003 led3
-/var/folders/n0/nrv0hhms1cx0j69_hx06fj7r0000gn/T//ccXYHPKB.s:781    .data:00000002 led4
-/var/folders/n0/nrv0hhms1cx0j69_hx06fj7r0000gn/T//ccXYHPKB.s:771    .data:00000000 out
-/var/folders/n0/nrv0hhms1cx0j69_hx06fj7r0000gn/T//ccXYHPKB.s:776    .data:00000001 taster
+/var/folders/n0/nrv0hhms1cx0j69_hx06fj7r0000gn/T//ccpvguCa.s:2      *ABS*:0000003e __SP_H__
+/var/folders/n0/nrv0hhms1cx0j69_hx06fj7r0000gn/T//ccpvguCa.s:3      *ABS*:0000003d __SP_L__
+/var/folders/n0/nrv0hhms1cx0j69_hx06fj7r0000gn/T//ccpvguCa.s:4      *ABS*:0000003f __SREG__
+/var/folders/n0/nrv0hhms1cx0j69_hx06fj7r0000gn/T//ccpvguCa.s:5      *ABS*:00000000 __tmp_reg__
+/var/folders/n0/nrv0hhms1cx0j69_hx06fj7r0000gn/T//ccpvguCa.s:6      *ABS*:00000001 __zero_reg__
+/var/folders/n0/nrv0hhms1cx0j69_hx06fj7r0000gn/T//ccpvguCa.s:113    .text:00000000 initIO
+/var/folders/n0/nrv0hhms1cx0j69_hx06fj7r0000gn/T//ccpvguCa.s:802    .bss:00000009 led_active
+/var/folders/n0/nrv0hhms1cx0j69_hx06fj7r0000gn/T//ccpvguCa.s:796    .data:00000005 led1
+/var/folders/n0/nrv0hhms1cx0j69_hx06fj7r0000gn/T//ccpvguCa.s:791    .data:00000004 led2
+/var/folders/n0/nrv0hhms1cx0j69_hx06fj7r0000gn/T//ccpvguCa.s:786    .data:00000003 led3
+/var/folders/n0/nrv0hhms1cx0j69_hx06fj7r0000gn/T//ccpvguCa.s:781    .data:00000002 led4
+/var/folders/n0/nrv0hhms1cx0j69_hx06fj7r0000gn/T//ccpvguCa.s:771    .data:00000000 out
+/var/folders/n0/nrv0hhms1cx0j69_hx06fj7r0000gn/T//ccpvguCa.s:776    .data:00000001 taster
                             *COM*:00000001 state
-/var/folders/n0/nrv0hhms1cx0j69_hx06fj7r0000gn/T//ccXYHPKB.s:264    .text.startup:00000000 main
-/var/folders/n0/nrv0hhms1cx0j69_hx06fj7r0000gn/T//ccXYHPKB.s:754    .bss:00000000 switchPressed
-/var/folders/n0/nrv0hhms1cx0j69_hx06fj7r0000gn/T//ccXYHPKB.s:765    .bss:00000005 time
-/var/folders/n0/nrv0hhms1cx0j69_hx06fj7r0000gn/T//ccXYHPKB.s:760    .bss:00000001 time_off
-/var/folders/n0/nrv0hhms1cx0j69_hx06fj7r0000gn/T//ccXYHPKB.s:680    .text:000000cc __vector_16
+/var/folders/n0/nrv0hhms1cx0j69_hx06fj7r0000gn/T//ccpvguCa.s:264    .text.startup:00000000 main
+/var/folders/n0/nrv0hhms1cx0j69_hx06fj7r0000gn/T//ccpvguCa.s:754    .bss:00000000 switchPressed
+/var/folders/n0/nrv0hhms1cx0j69_hx06fj7r0000gn/T//ccpvguCa.s:765    .bss:00000005 time
+/var/folders/n0/nrv0hhms1cx0j69_hx06fj7r0000gn/T//ccpvguCa.s:760    .bss:00000001 time_off
+/var/folders/n0/nrv0hhms1cx0j69_hx06fj7r0000gn/T//ccpvguCa.s:680    .text:000000cc __vector_16
 
 UNDEFINED SYMBOLS
 __udivmodsi4
