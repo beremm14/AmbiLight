@@ -3,15 +3,6 @@
 #include <avr/interrupt.h>
 #include <util/delay.h>
 
-uint8_t led_active = PB0;
-uint8_t led1 = PB1;
-uint8_t led2 = PB2;
-uint8_t led3 = PB3;
-uint8_t led4 = PB4;
-
-uint8_t taster = PD2;
-uint8_t out = PD3;
-
 uint32_t time = 0;
 uint32_t time_off = 0;
 
@@ -29,9 +20,9 @@ enum States state;
 uint8_t switchPressed = 0;
 
 void initIO(void) {
-    DDRB |= (1<<led_active | 1<<led1 | 1<<led2 | 1<<led3 | 1<<led4);
-    DDRD |= (1<<out);
-    PORTD |= (1<<taster);
+    DDRB |= (1<<PB0 | 1<<PB1 | 1<<PB2 | 1<<PB3 | 1<<PB4);
+    DDRD |= (1<<PD3);
+    PORTD |= (1<<PD2);
     
     OCR2B = 0;
     TCCR2A |= (1 << COM0A1);
@@ -79,36 +70,36 @@ int main(void) {
         
         switch (state) {
             case OFF:
-                PORTB &= ~(1<<led_active | 1<<led1 | 1<<led2 | 1<<led3 | 1<<led4);
+                PORTB &= ~(1<<PB0 | 1<<PB1 | 1<<PB2 | 1<<PB3 | 1<<PB4);
                 OCR2B = 0;
                 time_off = 0;
                 break;
             case ON:
-                PORTB |= (1<<led_active);
+                PORTB |= (1<<PB0);
                 if (OCR2B == 0)
                     OCR2B = 255;
                 time_off = 0;
                 break;
             case T1:
-                PORTB |= (1<<led1);
+                PORTB |= (1<<PB1);
                 if (time_off > 1800000) {
                     state = OFF;
                 }
                 break;
             case T2:
-                PORTB |= (1<<led2);
+                PORTB |= (1<<PB2);
                 if (time_off > 3600000) {
                     state = OFF;
                 }
                 break;
             case T3:
-                PORTB |= (1<<led3);
+                PORTB |= (1<<PB3);
                 if (time_off > 5400000) {
                     state = OFF;
                 }
                 break;
             case T4:
-                PORTB |= (1<<led4);
+                PORTB |= (1<<PB4);
                 if (time_off > 7200000) {
                     state = OFF;
                 }

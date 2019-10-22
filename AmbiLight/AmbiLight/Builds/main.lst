@@ -13,790 +13,559 @@
    3:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c **** #include <avr/interrupt.h>
    4:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c **** #include <util/delay.h>
    5:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c **** 
-   6:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c **** uint8_t led_active = PB0;
-   7:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c **** uint8_t led1 = PB1;
-   8:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c **** uint8_t led2 = PB2;
-   9:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c **** uint8_t led3 = PB3;
-  10:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c **** uint8_t led4 = PB4;
-  11:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c **** 
-  12:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c **** uint8_t taster = PD2;
-  13:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c **** uint8_t out = PD3;
-  14:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c **** 
-  15:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c **** uint32_t time = 0;
-  16:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c **** uint32_t time_off = 0;
+   6:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c **** uint32_t time = 0;
+   7:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c **** uint32_t time_off = 0;
+   8:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c **** 
+   9:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c **** enum States {
+  10:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****     OFF,
+  11:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****     ON,
+  12:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****     T1,
+  13:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****     T2,
+  14:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****     T3,
+  15:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****     T4
+  16:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c **** };
   17:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c **** 
-  18:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c **** enum States {
-  19:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****     OFF,
-  20:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****     ON,
-  21:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****     T1,
-  22:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****     T2,
-  23:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****     T3,
-  24:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****     T4
-  25:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c **** };
-  26:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c **** 
-  27:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c **** enum States state;
-  28:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c **** 
-  29:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c **** uint8_t switchPressed = 0;
-  30:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c **** 
-  31:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c **** void initIO(void) {
+  18:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c **** enum States state;
+  19:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c **** 
+  20:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c **** uint8_t switchPressed = 0;
+  21:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c **** 
+  22:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c **** void initIO(void) {
  115               	.LM0:
  116               	.LFBB1:
  117               	/* prologue: function */
  118               	/* frame size = 0 */
  119               	/* stack size = 0 */
  120               	.L__stack_usage = 0
-  32:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****     DDRB |= (1<<led_active | 1<<led1 | 1<<led2 | 1<<led3 | 1<<led4);
+  23:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****     DDRB |= (1<<PB0 | 1<<PB1 | 1<<PB2 | 1<<PB3 | 1<<PB4);
  122               	.LM1:
- 123 0000 64B1      		in r22,0x4
- 124 0002 81E0      		ldi r24,lo8(1)
- 125 0004 90E0      		ldi r25,0
- 126 0006 AC01      		movw r20,r24
- 127 0008 0090 0000 		lds r0,led_active
- 128 000c 00C0      		rjmp 2f
- 129               		1:
- 130 000e 440F      		lsl r20
- 131 0010 551F      		rol r21
- 132               		2:
- 133 0012 0A94      		dec r0
- 134 0014 02F4      		brpl 1b
- 135 0016 9C01      		movw r18,r24
- 136 0018 0090 0000 		lds r0,led1
- 137 001c 00C0      		rjmp 2f
- 138               		1:
- 139 001e 220F      		lsl r18
- 140 0020 331F      		rol r19
- 141               		2:
- 142 0022 0A94      		dec r0
- 143 0024 02F4      		brpl 1b
- 144 0026 422B      		or r20,r18
- 145 0028 462B      		or r20,r22
- 146 002a 9C01      		movw r18,r24
- 147 002c 0090 0000 		lds r0,led2
- 148 0030 00C0      		rjmp 2f
- 149               		1:
- 150 0032 220F      		lsl r18
- 151 0034 331F      		rol r19
- 152               		2:
- 153 0036 0A94      		dec r0
- 154 0038 02F4      		brpl 1b
- 155 003a 422B      		or r20,r18
- 156 003c 9C01      		movw r18,r24
- 157 003e 0090 0000 		lds r0,led3
- 158 0042 00C0      		rjmp 2f
- 159               		1:
- 160 0044 220F      		lsl r18
- 161 0046 331F      		rol r19
- 162               		2:
- 163 0048 0A94      		dec r0
- 164 004a 02F4      		brpl 1b
- 165 004c 422B      		or r20,r18
- 166 004e 9C01      		movw r18,r24
- 167 0050 0090 0000 		lds r0,led4
- 168 0054 00C0      		rjmp 2f
- 169               		1:
- 170 0056 220F      		lsl r18
- 171 0058 331F      		rol r19
- 172               		2:
- 173 005a 0A94      		dec r0
- 174 005c 02F4      		brpl 1b
- 175 005e 422B      		or r20,r18
- 176 0060 44B9      		out 0x4,r20
-  33:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****     DDRD |= (1<<out);
- 178               	.LM2:
- 179 0062 4AB1      		in r20,0xa
- 180 0064 9C01      		movw r18,r24
- 181 0066 0090 0000 		lds r0,out
- 182 006a 00C0      		rjmp 2f
- 183               		1:
- 184 006c 220F      		lsl r18
- 185 006e 331F      		rol r19
- 186               		2:
- 187 0070 0A94      		dec r0
- 188 0072 02F4      		brpl 1b
- 189 0074 422B      		or r20,r18
- 190 0076 4AB9      		out 0xa,r20
-  34:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****     PORTD |= (1<<taster);
- 192               	.LM3:
- 193 0078 2BB1      		in r18,0xb
- 194 007a 0090 0000 		lds r0,taster
- 195 007e 00C0      		rjmp 2f
- 196               		1:
- 197 0080 880F      		lsl r24
- 198 0082 991F      		rol r25
- 199               		2:
- 200 0084 0A94      		dec r0
- 201 0086 02F4      		brpl 1b
- 202 0088 282B      		or r18,r24
- 203 008a 2BB9      		out 0xb,r18
-  35:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****     
-  36:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****     OCR2B = 0;
- 205               	.LM4:
- 206 008c 1092 B400 		sts 180,__zero_reg__
-  37:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****     TCCR2A |= (1 << COM0A1);
- 208               	.LM5:
- 209 0090 E0EB      		ldi r30,lo8(-80)
- 210 0092 F0E0      		ldi r31,0
- 211 0094 8081      		ld r24,Z
- 212 0096 8068      		ori r24,lo8(-128)
- 213 0098 8083      		st Z,r24
-  38:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****     TCCR2A |= (1 << WGM01) | (1 << WGM00);
- 215               	.LM6:
- 216 009a 8081      		ld r24,Z
- 217 009c 8360      		ori r24,lo8(3)
- 218 009e 8083      		st Z,r24
-  39:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****     TCCR2B |= (1 << CS01);
- 220               	.LM7:
- 221 00a0 E1EB      		ldi r30,lo8(-79)
- 222 00a2 F0E0      		ldi r31,0
- 223 00a4 8081      		ld r24,Z
- 224 00a6 8260      		ori r24,lo8(2)
- 225 00a8 8083      		st Z,r24
-  40:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****     
-  41:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****     TCCR0A = (1<<CS01); //Prescaler 8
- 227               	.LM8:
- 228 00aa 82E0      		ldi r24,lo8(2)
- 229 00ac 84BD      		out 0x24,r24
-  42:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****     TIMSK0 |= (1<<TOIE0);
- 231               	.LM9:
- 232 00ae EEE6      		ldi r30,lo8(110)
- 233 00b0 F0E0      		ldi r31,0
- 234 00b2 8081      		ld r24,Z
- 235 00b4 8160      		ori r24,lo8(1)
- 236 00b6 8083      		st Z,r24
-  43:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****     
-  44:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****     EIMSK |= (1<<INT0);
- 238               	.LM10:
- 239 00b8 E89A      		sbi 0x1d,0
-  45:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****     EICRA |= (1<<ISC01);
- 241               	.LM11:
- 242 00ba E9E6      		ldi r30,lo8(105)
- 243 00bc F0E0      		ldi r31,0
- 244 00be 8081      		ld r24,Z
- 245 00c0 8260      		ori r24,lo8(2)
- 246 00c2 8083      		st Z,r24
-  46:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****     
-  47:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****     state = OFF;
- 248               	.LM12:
- 249 00c4 1092 0000 		sts state,__zero_reg__
-  48:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****     
-  49:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****     sei();
- 251               	.LM13:
- 252               	/* #APP */
- 253               	 ;  49 "/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c" 1
- 254 00c8 7894      		sei
- 255               	 ;  0 "" 2
- 256               	/* #NOAPP */
- 257 00ca 0895      		ret
- 259               	.Lscope1:
- 260               		.section	.text.startup,"ax",@progbits
- 262               	.global	main
- 264               	main:
-  50:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c **** }
-  51:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c **** 
-  52:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c **** int main(void) {
- 266               	.LM14:
- 267               	.LFBB2:
- 268               	/* prologue: function */
- 269               	/* frame size = 0 */
- 270               	/* stack size = 0 */
- 271               	.L__stack_usage = 0
-  53:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c **** 	initIO();
- 273               	.LM15:
- 274 0000 0E94 0000 		call initIO
-  54:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c **** 
-  55:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c **** 	while (1) {
-  56:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****         if ((PIND & (1<<PIND2)) == 0) {
-  57:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****             switchPressed = 1;
-  58:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****         } else {
-  59:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****             switchPressed = 0;
-  60:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****         }
-  61:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****         
-  62:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****         if (time <= 1000 && time >= 50 && switchPressed == 0) { //under 2sec
-  63:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****             if (state == ON)
-  64:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 state = T1;
-  65:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****             else if (state == T1)
-  66:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 state = T2;
-  67:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****             else if (state == T2)
-  68:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 state = T3;
-  69:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****             else if (state == T3)
-  70:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 state = T4;
-  71:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****             else if (state == T4)
-  72:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 state = OFF;
-  73:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****             else if (state == OFF)
-  74:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 state = ON;
-  75:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****         } else if (time >= 1000 && switchPressed == 1) {
-  76:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****             if (state != OFF && (time % 50) == 0)
- 276               	.LM16:
- 277 0004 82E3      		ldi r24,lo8(50)
- 278 0006 C82E      		mov r12,r24
- 279 0008 D12C      		mov r13,__zero_reg__
- 280 000a E12C      		mov r14,__zero_reg__
- 281 000c F12C      		mov r15,__zero_reg__
-  77:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 OCR2B--;
-  78:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****         }
-  79:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****         
-  80:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****         switch (state) {
-  81:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****             case OFF:
-  82:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 PORTB &= ~(1<<led_active | 1<<led1 | 1<<led2 | 1<<led3 | 1<<led4);
-  83:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 OCR2B = 0;
-  84:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 time_off = 0;
-  85:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 break;
-  86:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****             case ON:
-  87:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 PORTB |= (1<<led_active);
-  88:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 if (OCR2B == 0)
-  89:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                     OCR2B = 255;
-  90:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 time_off = 0;
-  91:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 break;
-  92:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****             case T1:
-  93:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 PORTB |= (1<<led1);
- 283               	.LM17:
- 284 000e C1E0      		ldi r28,lo8(1)
- 285 0010 D0E0      		ldi r29,0
-  89:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                     OCR2B = 255;
- 287               	.LM18:
- 288 0012 0FEF      		ldi r16,lo8(-1)
-  57:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****             switchPressed = 1;
- 290               	.LM19:
- 291 0014 11E0      		ldi r17,lo8(1)
-  70:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 state = T4;
- 293               	.LM20:
- 294 0016 95E0      		ldi r25,lo8(5)
- 295 0018 B92E      		mov r11,r25
-  68:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 state = T3;
- 297               	.LM21:
- 298 001a 24E0      		ldi r18,lo8(4)
- 299 001c A22E      		mov r10,r18
-  66:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 state = T2;
- 301               	.LM22:
- 302 001e 33E0      		ldi r19,lo8(3)
- 303 0020 932E      		mov r9,r19
-  64:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 state = T1;
- 305               	.LM23:
- 306 0022 42E0      		ldi r20,lo8(2)
- 307 0024 842E      		mov r8,r20
- 308               	.L24:
-  56:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****         if ((PIND & (1<<PIND2)) == 0) {
- 310               	.LM24:
- 311 0026 4A99      		sbic 0x9,2
- 312 0028 00C0      		rjmp .L3
-  57:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****             switchPressed = 1;
- 314               	.LM25:
- 315 002a 1093 0000 		sts switchPressed,r17
- 316 002e 00C0      		rjmp .L4
- 317               	.L3:
-  59:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****             switchPressed = 0;
- 319               	.LM26:
- 320 0030 1092 0000 		sts switchPressed,__zero_reg__
- 321               	.L4:
-  62:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****         if (time <= 1000 && time >= 50 && switchPressed == 0) { //under 2sec
- 323               	.LM27:
- 324 0034 6091 0000 		lds r22,time
- 325 0038 7091 0000 		lds r23,time+1
- 326 003c 8091 0000 		lds r24,time+2
- 327 0040 9091 0000 		lds r25,time+3
- 328 0044 2B01      		movw r4,r22
- 329 0046 3C01      		movw r6,r24
- 330 0048 22E3      		ldi r18,50
- 331 004a 421A      		sub r4,r18
- 332 004c 5108      		sbc r5,__zero_reg__
- 333 004e 6108      		sbc r6,__zero_reg__
- 334 0050 7108      		sbc r7,__zero_reg__
- 335 0052 2091 0000 		lds r18,state
- 336 0056 37EB      		ldi r19,-73
- 337 0058 4316      		cp r4,r19
- 338 005a 33E0      		ldi r19,3
- 339 005c 5306      		cpc r5,r19
- 340 005e 6104      		cpc r6,__zero_reg__
- 341 0060 7104      		cpc r7,__zero_reg__
- 342 0062 00F4      		brsh .L5
-  62:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****         if (time <= 1000 && time >= 50 && switchPressed == 0) { //under 2sec
- 344               	.LM28:
- 345 0064 3091 0000 		lds r19,switchPressed
- 346 0068 3111      		cpse r19,__zero_reg__
- 347 006a 00C0      		rjmp .L5
-  63:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****             if (state == ON)
- 349               	.LM29:
- 350 006c 2130      		cpi r18,lo8(1)
- 351 006e 01F4      		brne .L6
-  64:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 state = T1;
- 353               	.LM30:
- 354 0070 8092 0000 		sts state,r8
- 355 0074 00C0      		rjmp .L7
- 356               	.L6:
-  65:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****             else if (state == T1)
- 358               	.LM31:
- 359 0076 2230      		cpi r18,lo8(2)
- 360 0078 01F4      		brne .L8
-  66:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 state = T2;
- 362               	.LM32:
- 363 007a 9092 0000 		sts state,r9
- 364 007e 00C0      		rjmp .L7
- 365               	.L8:
-  67:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****             else if (state == T2)
- 367               	.LM33:
- 368 0080 2330      		cpi r18,lo8(3)
- 369 0082 01F4      		brne .L9
-  68:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 state = T3;
- 371               	.LM34:
- 372 0084 A092 0000 		sts state,r10
- 373 0088 00C0      		rjmp .L7
- 374               	.L9:
-  69:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****             else if (state == T3)
- 376               	.LM35:
- 377 008a 2430      		cpi r18,lo8(4)
- 378 008c 01F4      		brne .L10
-  70:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 state = T4;
- 380               	.LM36:
- 381 008e B092 0000 		sts state,r11
- 382 0092 00C0      		rjmp .L7
- 383               	.L10:
-  71:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****             else if (state == T4)
- 385               	.LM37:
- 386 0094 2530      		cpi r18,lo8(5)
- 387 0096 01F4      		brne .L11
-  72:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 state = OFF;
- 389               	.LM38:
- 390 0098 1092 0000 		sts state,__zero_reg__
- 391 009c 00C0      		rjmp .L7
- 392               	.L11:
-  73:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****             else if (state == OFF)
- 394               	.LM39:
- 395 009e 2111      		cpse r18,__zero_reg__
- 396 00a0 00C0      		rjmp .L7
-  74:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 state = ON;
- 398               	.LM40:
- 399 00a2 1093 0000 		sts state,r17
- 400 00a6 00C0      		rjmp .L7
- 401               	.L5:
-  75:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****         } else if (time >= 1000 && switchPressed == 1) {
- 403               	.LM41:
- 404 00a8 683E      		cpi r22,-24
- 405 00aa 33E0      		ldi r19,3
- 406 00ac 7307      		cpc r23,r19
- 407 00ae 8105      		cpc r24,__zero_reg__
- 408 00b0 9105      		cpc r25,__zero_reg__
- 409 00b2 00F0      		brlo .L7
-  75:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****         } else if (time >= 1000 && switchPressed == 1) {
- 411               	.LM42:
- 412 00b4 3091 0000 		lds r19,switchPressed
- 413 00b8 3130      		cpi r19,lo8(1)
- 414 00ba 01F4      		brne .L7
-  76:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****             if (state != OFF && (time % 50) == 0)
- 416               	.LM43:
- 417 00bc 2223      		tst r18
- 418 00be 01F0      		breq .L7
-  76:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****             if (state != OFF && (time % 50) == 0)
- 420               	.LM44:
- 421 00c0 A701      		movw r20,r14
- 422 00c2 9601      		movw r18,r12
- 423 00c4 0E94 0000 		call __udivmodsi4
- 424 00c8 672B      		or r22,r23
- 425 00ca 682B      		or r22,r24
- 426 00cc 692B      		or r22,r25
- 427 00ce 01F4      		brne .L7
-  77:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 OCR2B--;
- 429               	.LM45:
- 430 00d0 8091 B400 		lds r24,180
- 431 00d4 8150      		subi r24,lo8(-(-1))
- 432 00d6 8093 B400 		sts 180,r24
- 433               	.L7:
-  80:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****         switch (state) {
- 435               	.LM46:
- 436 00da 8091 0000 		lds r24,state
- 437 00de 8230      		cpi r24,lo8(2)
- 438 00e0 01F4      		brne .+2
- 439 00e2 00C0      		rjmp .L13
- 440 00e4 00F4      		brsh .L14
- 441 00e6 8823      		tst r24
- 442 00e8 01F0      		breq .L15
- 443 00ea 8130      		cpi r24,lo8(1)
- 444 00ec 01F0      		breq .L16
- 445 00ee 00C0      		rjmp .L12
- 446               	.L14:
- 447 00f0 8430      		cpi r24,lo8(4)
- 448 00f2 01F4      		brne .+2
- 449 00f4 00C0      		rjmp .L17
- 450 00f6 00F4      		brsh .+2
- 451 00f8 00C0      		rjmp .L18
- 452 00fa 8530      		cpi r24,lo8(5)
- 453 00fc 01F4      		brne .+2
- 454 00fe 00C0      		rjmp .L19
- 455 0100 00C0      		rjmp .L12
- 456               	.L15:
-  82:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 PORTB &= ~(1<<led_active | 1<<led1 | 1<<led2 | 1<<led3 | 1<<led4);
- 458               	.LM47:
- 459 0102 45B1      		in r20,0x5
- 460 0104 9E01      		movw r18,r28
- 461 0106 0090 0000 		lds r0,led1
- 462 010a 00C0      		rjmp 2f
- 463               		1:
- 464 010c 220F      		lsl r18
- 465 010e 331F      		rol r19
- 466               		2:
- 467 0110 0A94      		dec r0
- 468 0112 02F4      		brpl 1b
- 469 0114 CE01      		movw r24,r28
- 470 0116 0090 0000 		lds r0,led_active
- 471 011a 00C0      		rjmp 2f
- 472               		1:
- 473 011c 880F      		lsl r24
- 474 011e 991F      		rol r25
- 475               		2:
- 476 0120 0A94      		dec r0
- 477 0122 02F4      		brpl 1b
- 478 0124 282B      		or r18,r24
- 479 0126 CE01      		movw r24,r28
- 480 0128 0090 0000 		lds r0,led2
- 481 012c 00C0      		rjmp 2f
- 482               		1:
- 483 012e 880F      		lsl r24
- 484 0130 991F      		rol r25
- 485               		2:
- 486 0132 0A94      		dec r0
- 487 0134 02F4      		brpl 1b
- 488 0136 282B      		or r18,r24
- 489 0138 CE01      		movw r24,r28
- 490 013a 0090 0000 		lds r0,led3
- 491 013e 00C0      		rjmp 2f
- 492               		1:
- 493 0140 880F      		lsl r24
- 494 0142 991F      		rol r25
- 495               		2:
- 496 0144 0A94      		dec r0
- 497 0146 02F4      		brpl 1b
- 498 0148 282B      		or r18,r24
- 499 014a CE01      		movw r24,r28
- 500 014c 0090 0000 		lds r0,led4
- 501 0150 00C0      		rjmp 2f
- 502               		1:
- 503 0152 880F      		lsl r24
- 504 0154 991F      		rol r25
- 505               		2:
- 506 0156 0A94      		dec r0
- 507 0158 02F4      		brpl 1b
- 508 015a 282B      		or r18,r24
- 509 015c 2095      		com r18
- 510 015e 2423      		and r18,r20
- 511 0160 25B9      		out 0x5,r18
-  83:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 OCR2B = 0;
- 513               	.LM48:
- 514 0162 1092 B400 		sts 180,__zero_reg__
- 515 0166 00C0      		rjmp .L20
- 516               	.L16:
-  87:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 PORTB |= (1<<led_active);
- 518               	.LM49:
- 519 0168 25B1      		in r18,0x5
- 520 016a CE01      		movw r24,r28
- 521 016c 0090 0000 		lds r0,led_active
- 522 0170 00C0      		rjmp 2f
- 523               		1:
- 524 0172 880F      		lsl r24
- 525 0174 991F      		rol r25
- 526               		2:
- 527 0176 0A94      		dec r0
- 528 0178 02F4      		brpl 1b
- 529 017a 282B      		or r18,r24
- 530 017c 25B9      		out 0x5,r18
-  88:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 if (OCR2B == 0)
- 532               	.LM50:
- 533 017e 8091 B400 		lds r24,180
- 534 0182 8111      		cpse r24,__zero_reg__
- 535 0184 00C0      		rjmp .L20
-  89:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                     OCR2B = 255;
- 537               	.LM51:
- 538 0186 0093 B400 		sts 180,r16
- 539               	.L20:
-  90:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 time_off = 0;
- 541               	.LM52:
- 542 018a 1092 0000 		sts time_off,__zero_reg__
- 543 018e 1092 0000 		sts time_off+1,__zero_reg__
- 544 0192 1092 0000 		sts time_off+2,__zero_reg__
- 545 0196 1092 0000 		sts time_off+3,__zero_reg__
-  91:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 break;
- 547               	.LM53:
- 548 019a 00C0      		rjmp .L12
- 549               	.L13:
- 551               	.LM54:
- 552 019c 25B1      		in r18,0x5
- 553 019e CE01      		movw r24,r28
- 554 01a0 0090 0000 		lds r0,led1
- 555 01a4 00C0      		rjmp 2f
- 556               		1:
- 557 01a6 880F      		lsl r24
- 558 01a8 991F      		rol r25
- 559               		2:
- 560 01aa 0A94      		dec r0
- 561 01ac 02F4      		brpl 1b
- 562 01ae 282B      		or r18,r24
- 563 01b0 25B9      		out 0x5,r18
-  94:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 if (time_off > 1800000) {
- 565               	.LM55:
- 566 01b2 8091 0000 		lds r24,time_off
- 567 01b6 9091 0000 		lds r25,time_off+1
- 568 01ba A091 0000 		lds r26,time_off+2
- 569 01be B091 0000 		lds r27,time_off+3
- 570 01c2 8134      		cpi r24,65
- 571 01c4 9747      		sbci r25,119
- 572 01c6 AB41      		sbci r26,27
- 573 01c8 B105      		cpc r27,__zero_reg__
- 574 01ca 00F4      		brsh .+2
- 575 01cc 00C0      		rjmp .L12
- 576 01ce 00C0      		rjmp .L29
- 577               	.L18:
-  95:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                     state = OFF;
-  96:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 }
-  97:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 break;
-  98:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****             case T2:
-  99:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 PORTB |= (1<<led2);
- 579               	.LM56:
- 580 01d0 25B1      		in r18,0x5
- 581 01d2 CE01      		movw r24,r28
- 582 01d4 0090 0000 		lds r0,led2
- 583 01d8 00C0      		rjmp 2f
- 584               		1:
- 585 01da 880F      		lsl r24
- 586 01dc 991F      		rol r25
- 587               		2:
- 588 01de 0A94      		dec r0
- 589 01e0 02F4      		brpl 1b
- 590 01e2 282B      		or r18,r24
- 591 01e4 25B9      		out 0x5,r18
- 100:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 if (time_off > 3600000) {
- 593               	.LM57:
- 594 01e6 8091 0000 		lds r24,time_off
- 595 01ea 9091 0000 		lds r25,time_off+1
- 596 01ee A091 0000 		lds r26,time_off+2
- 597 01f2 B091 0000 		lds r27,time_off+3
- 598 01f6 8138      		cpi r24,-127
- 599 01f8 9E4E      		sbci r25,-18
- 600 01fa A643      		sbci r26,54
- 601 01fc B105      		cpc r27,__zero_reg__
- 602 01fe 00F0      		brlo .L12
- 603 0200 00C0      		rjmp .L29
- 604               	.L17:
- 101:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                     state = OFF;
- 102:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 }
- 103:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 break;
- 104:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****             case T3:
- 105:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 PORTB |= (1<<led3);
- 606               	.LM58:
- 607 0202 25B1      		in r18,0x5
- 608 0204 CE01      		movw r24,r28
- 609 0206 0090 0000 		lds r0,led3
- 610 020a 00C0      		rjmp 2f
- 611               		1:
- 612 020c 880F      		lsl r24
- 613 020e 991F      		rol r25
- 614               		2:
- 615 0210 0A94      		dec r0
- 616 0212 02F4      		brpl 1b
- 617 0214 282B      		or r18,r24
- 618 0216 25B9      		out 0x5,r18
- 106:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 if (time_off > 5400000) {
- 620               	.LM59:
- 621 0218 8091 0000 		lds r24,time_off
- 622 021c 9091 0000 		lds r25,time_off+1
- 623 0220 A091 0000 		lds r26,time_off+2
- 624 0224 B091 0000 		lds r27,time_off+3
- 625 0228 813C      		cpi r24,-63
- 626 022a 9546      		sbci r25,101
- 627 022c A245      		sbci r26,82
- 628 022e B105      		cpc r27,__zero_reg__
- 629 0230 00F0      		brlo .L12
- 630 0232 00C0      		rjmp .L29
- 631               	.L19:
- 107:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                     state = OFF;
- 108:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 }
- 109:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 break;
- 110:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****             case T4:
- 111:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 PORTB |= (1<<led4);
- 633               	.LM60:
- 634 0234 25B1      		in r18,0x5
- 635 0236 CE01      		movw r24,r28
- 636 0238 0090 0000 		lds r0,led4
- 637 023c 00C0      		rjmp 2f
- 638               		1:
- 639 023e 880F      		lsl r24
- 640 0240 991F      		rol r25
- 641               		2:
- 642 0242 0A94      		dec r0
- 643 0244 02F4      		brpl 1b
- 644 0246 282B      		or r18,r24
- 645 0248 25B9      		out 0x5,r18
- 112:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 if (time_off > 7200000) {
- 647               	.LM61:
- 648 024a 8091 0000 		lds r24,time_off
- 649 024e 9091 0000 		lds r25,time_off+1
- 650 0252 A091 0000 		lds r26,time_off+2
- 651 0256 B091 0000 		lds r27,time_off+3
- 652 025a 8130      		cpi r24,1
- 653 025c 9D4D      		sbci r25,-35
- 654 025e AD46      		sbci r26,109
- 655 0260 B105      		cpc r27,__zero_reg__
- 656 0262 00F0      		brlo .L12
- 657               	.L29:
- 113:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                     state = OFF;
- 659               	.LM62:
- 660 0264 1092 0000 		sts state,__zero_reg__
- 661               	.L12:
- 114:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 }
- 115:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 break;
- 116:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****         }
- 117:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****         
- 118:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****         if (switchPressed == 0) {
- 663               	.LM63:
- 664 0268 8091 0000 		lds r24,switchPressed
- 665 026c 8111      		cpse r24,__zero_reg__
- 666 026e 00C0      		rjmp .L24
- 119:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****             time = 0;
- 668               	.LM64:
- 669 0270 1092 0000 		sts time,__zero_reg__
- 670 0274 1092 0000 		sts time+1,__zero_reg__
- 671 0278 1092 0000 		sts time+2,__zero_reg__
- 672 027c 1092 0000 		sts time+3,__zero_reg__
- 673 0280 00C0      		rjmp .L24
- 675               	.Lscope2:
- 676               		.text
- 678               	.global	__vector_16
- 680               	__vector_16:
- 120:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****         }
- 121:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c **** 	}
- 122:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c **** 	return 0; // never reached
- 123:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c **** }
- 124:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c **** 
- 125:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c **** ISR(TIMER0_OVF_vect) {
- 682               	.LM65:
- 683               	.LFBB3:
- 684 00cc 1F92      		push r1
- 685 00ce 0F92      		push r0
- 686 00d0 0FB6      		in r0,__SREG__
- 687 00d2 0F92      		push r0
- 688 00d4 1124      		clr __zero_reg__
- 689 00d6 8F93      		push r24
- 690 00d8 9F93      		push r25
- 691 00da AF93      		push r26
- 692 00dc BF93      		push r27
- 693               	/* prologue: Signal */
- 694               	/* frame size = 0 */
- 695               	/* stack size = 7 */
- 696               	.L__stack_usage = 7
- 126:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****     //all 2ms
- 127:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****     if (switchPressed)
- 698               	.LM66:
- 699 00de 8091 0000 		lds r24,switchPressed
- 700 00e2 8823      		tst r24
- 701 00e4 01F0      		breq .L32
- 128:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****         time++;
- 703               	.LM67:
- 704 00e6 8091 0000 		lds r24,time
- 705 00ea 9091 0000 		lds r25,time+1
- 706 00ee A091 0000 		lds r26,time+2
- 707 00f2 B091 0000 		lds r27,time+3
- 708 00f6 0196      		adiw r24,1
- 709 00f8 A11D      		adc r26,__zero_reg__
- 710 00fa B11D      		adc r27,__zero_reg__
- 711 00fc 8093 0000 		sts time,r24
- 712 0100 9093 0000 		sts time+1,r25
- 713 0104 A093 0000 		sts time+2,r26
- 714 0108 B093 0000 		sts time+3,r27
- 715               	.L32:
- 129:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****     
- 130:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****     if (state == T1 || state == T2 || state == T3 || state == T4)
- 717               	.LM68:
- 718 010c 8091 0000 		lds r24,state
- 719 0110 8250      		subi r24,lo8(-(-2))
- 720 0112 8430      		cpi r24,lo8(4)
- 721 0114 00F4      		brsh .L31
- 131:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****         time_off++;
- 723               	.LM69:
- 724 0116 8091 0000 		lds r24,time_off
- 725 011a 9091 0000 		lds r25,time_off+1
- 726 011e A091 0000 		lds r26,time_off+2
- 727 0122 B091 0000 		lds r27,time_off+3
- 728 0126 0196      		adiw r24,1
- 729 0128 A11D      		adc r26,__zero_reg__
- 730 012a B11D      		adc r27,__zero_reg__
- 731 012c 8093 0000 		sts time_off,r24
- 732 0130 9093 0000 		sts time_off+1,r25
- 733 0134 A093 0000 		sts time_off+2,r26
- 734 0138 B093 0000 		sts time_off+3,r27
- 735               	.L31:
- 736               	/* epilogue start */
- 132:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****     
- 133:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c **** }
- 738               	.LM70:
- 739 013c BF91      		pop r27
- 740 013e AF91      		pop r26
- 741 0140 9F91      		pop r25
- 742 0142 8F91      		pop r24
- 743 0144 0F90      		pop r0
- 744 0146 0FBE      		out __SREG__,r0
- 745 0148 0F90      		pop r0
- 746 014a 1F90      		pop r1
- 747 014c 1895      		reti
- 749               	.Lscope3:
- 750               	.global	switchPressed
- 751               		.section .bss
- 754               	switchPressed:
- 755 0000 00        		.zero	1
- 756               		.comm	state,1,1
- 757               	.global	time_off
- 760               	time_off:
- 761 0001 0000 0000 		.zero	4
- 762               	.global	time
- 765               	time:
- 766 0005 0000 0000 		.zero	4
- 767               	.global	out
- 768               		.data
- 771               	out:
- 772 0000 03        		.byte	3
- 773               	.global	taster
- 776               	taster:
- 777 0001 02        		.byte	2
- 778               	.global	led4
- 781               	led4:
- 782 0002 04        		.byte	4
- 783               	.global	led3
- 786               	led3:
- 787 0003 03        		.byte	3
- 788               	.global	led2
- 791               	led2:
- 792 0004 02        		.byte	2
- 793               	.global	led1
- 796               	led1:
- 797 0005 01        		.byte	1
- 798               	.global	led_active
- 799               		.section .bss
- 802               	led_active:
- 803 0009 00        		.zero	1
- 815               		.text
- 817               	.Letext0:
- 818               		.ident	"GCC: (GNU) 4.8.1"
- 819               	.global __do_copy_data
- 820               	.global __do_clear_bss
+ 123 0000 84B1      		in r24,0x4
+ 124 0002 8F61      		ori r24,lo8(31)
+ 125 0004 84B9      		out 0x4,r24
+  24:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****     DDRD |= (1<<PD3);
+ 127               	.LM2:
+ 128 0006 539A      		sbi 0xa,3
+  25:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****     PORTD |= (1<<PD2);
+ 130               	.LM3:
+ 131 0008 5A9A      		sbi 0xb,2
+  26:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****     
+  27:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****     OCR2B = 0;
+ 133               	.LM4:
+ 134 000a 1092 B400 		sts 180,__zero_reg__
+  28:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****     TCCR2A |= (1 << COM0A1);
+ 136               	.LM5:
+ 137 000e E0EB      		ldi r30,lo8(-80)
+ 138 0010 F0E0      		ldi r31,0
+ 139 0012 8081      		ld r24,Z
+ 140 0014 8068      		ori r24,lo8(-128)
+ 141 0016 8083      		st Z,r24
+  29:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****     TCCR2A |= (1 << WGM01) | (1 << WGM00);
+ 143               	.LM6:
+ 144 0018 8081      		ld r24,Z
+ 145 001a 8360      		ori r24,lo8(3)
+ 146 001c 8083      		st Z,r24
+  30:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****     TCCR2B |= (1 << CS01);
+ 148               	.LM7:
+ 149 001e E1EB      		ldi r30,lo8(-79)
+ 150 0020 F0E0      		ldi r31,0
+ 151 0022 8081      		ld r24,Z
+ 152 0024 8260      		ori r24,lo8(2)
+ 153 0026 8083      		st Z,r24
+  31:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****     
+  32:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****     TCCR0A = (1<<CS01); //Prescaler 8
+ 155               	.LM8:
+ 156 0028 82E0      		ldi r24,lo8(2)
+ 157 002a 84BD      		out 0x24,r24
+  33:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****     TIMSK0 |= (1<<TOIE0);
+ 159               	.LM9:
+ 160 002c EEE6      		ldi r30,lo8(110)
+ 161 002e F0E0      		ldi r31,0
+ 162 0030 8081      		ld r24,Z
+ 163 0032 8160      		ori r24,lo8(1)
+ 164 0034 8083      		st Z,r24
+  34:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****     
+  35:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****     EIMSK |= (1<<INT0);
+ 166               	.LM10:
+ 167 0036 E89A      		sbi 0x1d,0
+  36:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****     EICRA |= (1<<ISC01);
+ 169               	.LM11:
+ 170 0038 E9E6      		ldi r30,lo8(105)
+ 171 003a F0E0      		ldi r31,0
+ 172 003c 8081      		ld r24,Z
+ 173 003e 8260      		ori r24,lo8(2)
+ 174 0040 8083      		st Z,r24
+  37:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****     
+  38:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****     state = OFF;
+ 176               	.LM12:
+ 177 0042 1092 0000 		sts state,__zero_reg__
+  39:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****     
+  40:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****     sei();
+ 179               	.LM13:
+ 180               	/* #APP */
+ 181               	 ;  40 "/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c" 1
+ 182 0046 7894      		sei
+ 183               	 ;  0 "" 2
+ 184               	/* #NOAPP */
+ 185 0048 0895      		ret
+ 187               	.Lscope1:
+ 188               		.section	.text.startup,"ax",@progbits
+ 190               	.global	main
+ 192               	main:
+  41:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c **** }
+  42:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c **** 
+  43:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c **** int main(void) {
+ 194               	.LM14:
+ 195               	.LFBB2:
+ 196               	/* prologue: function */
+ 197               	/* frame size = 0 */
+ 198               	/* stack size = 0 */
+ 199               	.L__stack_usage = 0
+  44:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c **** 	initIO();
+ 201               	.LM15:
+ 202 0000 0E94 0000 		call initIO
+  45:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c **** 
+  46:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c **** 	while (1) {
+  47:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****         if ((PIND & (1<<PIND2)) == 0) {
+  48:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****             switchPressed = 0;
+  49:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****         } else {
+  50:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****             switchPressed = 1;
+  51:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****         }
+  52:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****         
+  53:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****         if (time <= 1000 && time >= 50 && switchPressed == 0) { //under 2sec
+  54:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****             if (state == ON)
+  55:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 state = T1;
+  56:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****             else if (state == T1)
+  57:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 state = T2;
+  58:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****             else if (state == T2)
+  59:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 state = T3;
+  60:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****             else if (state == T3)
+  61:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 state = T4;
+  62:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****             else if (state == T4)
+  63:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 state = OFF;
+  64:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****             else if (state == OFF)
+  65:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 state = ON;
+  66:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****         } else if (time >= 1000 && switchPressed == 1) {
+  67:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****             if (state != OFF && (time % 50) == 0)
+ 204               	.LM16:
+ 205 0004 82E3      		ldi r24,lo8(50)
+ 206 0006 C82E      		mov r12,r24
+ 207 0008 D12C      		mov r13,__zero_reg__
+ 208 000a E12C      		mov r14,__zero_reg__
+ 209 000c F12C      		mov r15,__zero_reg__
+  68:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 OCR2B--;
+  69:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****         }
+  70:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****         
+  71:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****         switch (state) {
+  72:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****             case OFF:
+  73:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 PORTB &= ~(1<<PB0 | 1<<PB1 | 1<<PB2 | 1<<PB3 | 1<<PB4);
+  74:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 OCR2B = 0;
+  75:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 time_off = 0;
+  76:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 break;
+  77:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****             case ON:
+  78:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 PORTB |= (1<<PB0);
+  79:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 if (OCR2B == 0)
+  80:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                     OCR2B = 255;
+ 211               	.LM17:
+ 212 000e DFEF      		ldi r29,lo8(-1)
+  50:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****             switchPressed = 1;
+ 214               	.LM18:
+ 215 0010 C1E0      		ldi r28,lo8(1)
+  61:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 state = T4;
+ 217               	.LM19:
+ 218 0012 15E0      		ldi r17,lo8(5)
+  59:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 state = T3;
+ 220               	.LM20:
+ 221 0014 04E0      		ldi r16,lo8(4)
+  57:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 state = T2;
+ 223               	.LM21:
+ 224 0016 93E0      		ldi r25,lo8(3)
+ 225 0018 B92E      		mov r11,r25
+  55:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 state = T1;
+ 227               	.LM22:
+ 228 001a 22E0      		ldi r18,lo8(2)
+ 229 001c A22E      		mov r10,r18
+ 230               	.L24:
+  47:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****         if ((PIND & (1<<PIND2)) == 0) {
+ 232               	.LM23:
+ 233 001e 4A99      		sbic 0x9,2
+ 234 0020 00C0      		rjmp .L3
+  48:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****             switchPressed = 0;
+ 236               	.LM24:
+ 237 0022 1092 0000 		sts switchPressed,__zero_reg__
+ 238 0026 00C0      		rjmp .L4
+ 239               	.L3:
+  50:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****             switchPressed = 1;
+ 241               	.LM25:
+ 242 0028 C093 0000 		sts switchPressed,r28
+ 243               	.L4:
+  53:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****         if (time <= 1000 && time >= 50 && switchPressed == 0) { //under 2sec
+ 245               	.LM26:
+ 246 002c 6091 0000 		lds r22,time
+ 247 0030 7091 0000 		lds r23,time+1
+ 248 0034 8091 0000 		lds r24,time+2
+ 249 0038 9091 0000 		lds r25,time+3
+ 250 003c 2B01      		movw r4,r22
+ 251 003e 3C01      		movw r6,r24
+ 252 0040 22E3      		ldi r18,50
+ 253 0042 421A      		sub r4,r18
+ 254 0044 5108      		sbc r5,__zero_reg__
+ 255 0046 6108      		sbc r6,__zero_reg__
+ 256 0048 7108      		sbc r7,__zero_reg__
+ 257 004a 2091 0000 		lds r18,state
+ 258 004e 37EB      		ldi r19,-73
+ 259 0050 4316      		cp r4,r19
+ 260 0052 33E0      		ldi r19,3
+ 261 0054 5306      		cpc r5,r19
+ 262 0056 6104      		cpc r6,__zero_reg__
+ 263 0058 7104      		cpc r7,__zero_reg__
+ 264 005a 00F4      		brsh .L5
+  53:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****         if (time <= 1000 && time >= 50 && switchPressed == 0) { //under 2sec
+ 266               	.LM27:
+ 267 005c 3091 0000 		lds r19,switchPressed
+ 268 0060 3111      		cpse r19,__zero_reg__
+ 269 0062 00C0      		rjmp .L5
+  54:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****             if (state == ON)
+ 271               	.LM28:
+ 272 0064 2130      		cpi r18,lo8(1)
+ 273 0066 01F4      		brne .L6
+  55:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 state = T1;
+ 275               	.LM29:
+ 276 0068 A092 0000 		sts state,r10
+ 277 006c 00C0      		rjmp .L7
+ 278               	.L6:
+  56:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****             else if (state == T1)
+ 280               	.LM30:
+ 281 006e 2230      		cpi r18,lo8(2)
+ 282 0070 01F4      		brne .L8
+  57:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 state = T2;
+ 284               	.LM31:
+ 285 0072 B092 0000 		sts state,r11
+ 286 0076 00C0      		rjmp .L7
+ 287               	.L8:
+  58:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****             else if (state == T2)
+ 289               	.LM32:
+ 290 0078 2330      		cpi r18,lo8(3)
+ 291 007a 01F4      		brne .L9
+  59:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 state = T3;
+ 293               	.LM33:
+ 294 007c 0093 0000 		sts state,r16
+ 295 0080 00C0      		rjmp .L7
+ 296               	.L9:
+  60:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****             else if (state == T3)
+ 298               	.LM34:
+ 299 0082 2430      		cpi r18,lo8(4)
+ 300 0084 01F4      		brne .L10
+  61:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 state = T4;
+ 302               	.LM35:
+ 303 0086 1093 0000 		sts state,r17
+ 304 008a 00C0      		rjmp .L7
+ 305               	.L10:
+  62:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****             else if (state == T4)
+ 307               	.LM36:
+ 308 008c 2530      		cpi r18,lo8(5)
+ 309 008e 01F4      		brne .L11
+  63:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 state = OFF;
+ 311               	.LM37:
+ 312 0090 1092 0000 		sts state,__zero_reg__
+ 313 0094 00C0      		rjmp .L7
+ 314               	.L11:
+  64:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****             else if (state == OFF)
+ 316               	.LM38:
+ 317 0096 2111      		cpse r18,__zero_reg__
+ 318 0098 00C0      		rjmp .L7
+  65:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 state = ON;
+ 320               	.LM39:
+ 321 009a C093 0000 		sts state,r28
+ 322 009e 00C0      		rjmp .L7
+ 323               	.L5:
+  66:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****         } else if (time >= 1000 && switchPressed == 1) {
+ 325               	.LM40:
+ 326 00a0 683E      		cpi r22,-24
+ 327 00a2 33E0      		ldi r19,3
+ 328 00a4 7307      		cpc r23,r19
+ 329 00a6 8105      		cpc r24,__zero_reg__
+ 330 00a8 9105      		cpc r25,__zero_reg__
+ 331 00aa 00F0      		brlo .L7
+  66:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****         } else if (time >= 1000 && switchPressed == 1) {
+ 333               	.LM41:
+ 334 00ac 3091 0000 		lds r19,switchPressed
+ 335 00b0 3130      		cpi r19,lo8(1)
+ 336 00b2 01F4      		brne .L7
+  67:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****             if (state != OFF && (time % 50) == 0)
+ 338               	.LM42:
+ 339 00b4 2223      		tst r18
+ 340 00b6 01F0      		breq .L7
+  67:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****             if (state != OFF && (time % 50) == 0)
+ 342               	.LM43:
+ 343 00b8 A701      		movw r20,r14
+ 344 00ba 9601      		movw r18,r12
+ 345 00bc 0E94 0000 		call __udivmodsi4
+ 346 00c0 672B      		or r22,r23
+ 347 00c2 682B      		or r22,r24
+ 348 00c4 692B      		or r22,r25
+ 349 00c6 01F4      		brne .L7
+  68:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 OCR2B--;
+ 351               	.LM44:
+ 352 00c8 8091 B400 		lds r24,180
+ 353 00cc 8150      		subi r24,lo8(-(-1))
+ 354 00ce 8093 B400 		sts 180,r24
+ 355               	.L7:
+  71:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****         switch (state) {
+ 357               	.LM45:
+ 358 00d2 8091 0000 		lds r24,state
+ 359 00d6 8230      		cpi r24,lo8(2)
+ 360 00d8 01F0      		breq .L13
+ 361 00da 00F4      		brsh .L14
+ 362 00dc 8823      		tst r24
+ 363 00de 01F0      		breq .L15
+ 364 00e0 8130      		cpi r24,lo8(1)
+ 365 00e2 01F0      		breq .L16
+ 366 00e4 00C0      		rjmp .L12
+ 367               	.L14:
+ 368 00e6 8430      		cpi r24,lo8(4)
+ 369 00e8 01F0      		breq .L17
+ 370 00ea 00F0      		brlo .L18
+ 371 00ec 8530      		cpi r24,lo8(5)
+ 372 00ee 01F4      		brne .+2
+ 373 00f0 00C0      		rjmp .L19
+ 374 00f2 00C0      		rjmp .L12
+ 375               	.L15:
+  73:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 PORTB &= ~(1<<PB0 | 1<<PB1 | 1<<PB2 | 1<<PB3 | 1<<PB4);
+ 377               	.LM46:
+ 378 00f4 85B1      		in r24,0x5
+ 379 00f6 807E      		andi r24,lo8(-32)
+ 380 00f8 85B9      		out 0x5,r24
+  74:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 OCR2B = 0;
+ 382               	.LM47:
+ 383 00fa 1092 B400 		sts 180,__zero_reg__
+ 384 00fe 00C0      		rjmp .L20
+ 385               	.L16:
+  78:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 PORTB |= (1<<PB0);
+ 387               	.LM48:
+ 388 0100 289A      		sbi 0x5,0
+  79:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 if (OCR2B == 0)
+ 390               	.LM49:
+ 391 0102 8091 B400 		lds r24,180
+ 392 0106 8111      		cpse r24,__zero_reg__
+ 393 0108 00C0      		rjmp .L20
+ 395               	.LM50:
+ 396 010a D093 B400 		sts 180,r29
+ 397               	.L20:
+  81:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 time_off = 0;
+ 399               	.LM51:
+ 400 010e 1092 0000 		sts time_off,__zero_reg__
+ 401 0112 1092 0000 		sts time_off+1,__zero_reg__
+ 402 0116 1092 0000 		sts time_off+2,__zero_reg__
+ 403 011a 1092 0000 		sts time_off+3,__zero_reg__
+  82:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 break;
+ 405               	.LM52:
+ 406 011e 00C0      		rjmp .L12
+ 407               	.L13:
+  83:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****             case T1:
+  84:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 PORTB |= (1<<PB1);
+ 409               	.LM53:
+ 410 0120 299A      		sbi 0x5,1
+  85:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 if (time_off > 1800000) {
+ 412               	.LM54:
+ 413 0122 8091 0000 		lds r24,time_off
+ 414 0126 9091 0000 		lds r25,time_off+1
+ 415 012a A091 0000 		lds r26,time_off+2
+ 416 012e B091 0000 		lds r27,time_off+3
+ 417 0132 8134      		cpi r24,65
+ 418 0134 9747      		sbci r25,119
+ 419 0136 AB41      		sbci r26,27
+ 420 0138 B105      		cpc r27,__zero_reg__
+ 421 013a 00F0      		brlo .L12
+ 422 013c 00C0      		rjmp .L29
+ 423               	.L18:
+  86:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                     state = OFF;
+  87:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 }
+  88:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 break;
+  89:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****             case T2:
+  90:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 PORTB |= (1<<PB2);
+ 425               	.LM55:
+ 426 013e 2A9A      		sbi 0x5,2
+  91:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 if (time_off > 3600000) {
+ 428               	.LM56:
+ 429 0140 8091 0000 		lds r24,time_off
+ 430 0144 9091 0000 		lds r25,time_off+1
+ 431 0148 A091 0000 		lds r26,time_off+2
+ 432 014c B091 0000 		lds r27,time_off+3
+ 433 0150 8138      		cpi r24,-127
+ 434 0152 9E4E      		sbci r25,-18
+ 435 0154 A643      		sbci r26,54
+ 436 0156 B105      		cpc r27,__zero_reg__
+ 437 0158 00F0      		brlo .L12
+ 438 015a 00C0      		rjmp .L29
+ 439               	.L17:
+  92:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                     state = OFF;
+  93:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 }
+  94:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 break;
+  95:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****             case T3:
+  96:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 PORTB |= (1<<PB3);
+ 441               	.LM57:
+ 442 015c 2B9A      		sbi 0x5,3
+  97:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 if (time_off > 5400000) {
+ 444               	.LM58:
+ 445 015e 8091 0000 		lds r24,time_off
+ 446 0162 9091 0000 		lds r25,time_off+1
+ 447 0166 A091 0000 		lds r26,time_off+2
+ 448 016a B091 0000 		lds r27,time_off+3
+ 449 016e 813C      		cpi r24,-63
+ 450 0170 9546      		sbci r25,101
+ 451 0172 A245      		sbci r26,82
+ 452 0174 B105      		cpc r27,__zero_reg__
+ 453 0176 00F0      		brlo .L12
+ 454 0178 00C0      		rjmp .L29
+ 455               	.L19:
+  98:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                     state = OFF;
+  99:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 }
+ 100:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 break;
+ 101:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****             case T4:
+ 102:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 PORTB |= (1<<PB4);
+ 457               	.LM59:
+ 458 017a 2C9A      		sbi 0x5,4
+ 103:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 if (time_off > 7200000) {
+ 460               	.LM60:
+ 461 017c 8091 0000 		lds r24,time_off
+ 462 0180 9091 0000 		lds r25,time_off+1
+ 463 0184 A091 0000 		lds r26,time_off+2
+ 464 0188 B091 0000 		lds r27,time_off+3
+ 465 018c 8130      		cpi r24,1
+ 466 018e 9D4D      		sbci r25,-35
+ 467 0190 AD46      		sbci r26,109
+ 468 0192 B105      		cpc r27,__zero_reg__
+ 469 0194 00F0      		brlo .L12
+ 470               	.L29:
+ 104:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                     state = OFF;
+ 472               	.LM61:
+ 473 0196 1092 0000 		sts state,__zero_reg__
+ 474               	.L12:
+ 105:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 }
+ 106:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****                 break;
+ 107:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****         }
+ 108:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****         
+ 109:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****         if (switchPressed == 0) {
+ 476               	.LM62:
+ 477 019a 8091 0000 		lds r24,switchPressed
+ 478 019e 8111      		cpse r24,__zero_reg__
+ 479 01a0 00C0      		rjmp .L24
+ 110:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****             time = 0;
+ 481               	.LM63:
+ 482 01a2 1092 0000 		sts time,__zero_reg__
+ 483 01a6 1092 0000 		sts time+1,__zero_reg__
+ 484 01aa 1092 0000 		sts time+2,__zero_reg__
+ 485 01ae 1092 0000 		sts time+3,__zero_reg__
+ 486 01b2 00C0      		rjmp .L24
+ 488               	.Lscope2:
+ 489               		.text
+ 491               	.global	__vector_16
+ 493               	__vector_16:
+ 111:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****         }
+ 112:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c **** 	}
+ 113:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c **** 	return 0; // never reached
+ 114:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c **** }
+ 115:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c **** 
+ 116:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c **** ISR(TIMER0_OVF_vect) {
+ 495               	.LM64:
+ 496               	.LFBB3:
+ 497 004a 1F92      		push r1
+ 498 004c 0F92      		push r0
+ 499 004e 0FB6      		in r0,__SREG__
+ 500 0050 0F92      		push r0
+ 501 0052 1124      		clr __zero_reg__
+ 502 0054 8F93      		push r24
+ 503 0056 9F93      		push r25
+ 504 0058 AF93      		push r26
+ 505 005a BF93      		push r27
+ 506               	/* prologue: Signal */
+ 507               	/* frame size = 0 */
+ 508               	/* stack size = 7 */
+ 509               	.L__stack_usage = 7
+ 117:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****     //all 2ms
+ 118:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****     if (switchPressed)
+ 511               	.LM65:
+ 512 005c 8091 0000 		lds r24,switchPressed
+ 513 0060 8823      		tst r24
+ 514 0062 01F0      		breq .L32
+ 119:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****         time++;
+ 516               	.LM66:
+ 517 0064 8091 0000 		lds r24,time
+ 518 0068 9091 0000 		lds r25,time+1
+ 519 006c A091 0000 		lds r26,time+2
+ 520 0070 B091 0000 		lds r27,time+3
+ 521 0074 0196      		adiw r24,1
+ 522 0076 A11D      		adc r26,__zero_reg__
+ 523 0078 B11D      		adc r27,__zero_reg__
+ 524 007a 8093 0000 		sts time,r24
+ 525 007e 9093 0000 		sts time+1,r25
+ 526 0082 A093 0000 		sts time+2,r26
+ 527 0086 B093 0000 		sts time+3,r27
+ 528               	.L32:
+ 120:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****     
+ 121:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****     if (state == T1 || state == T2 || state == T3 || state == T4)
+ 530               	.LM67:
+ 531 008a 8091 0000 		lds r24,state
+ 532 008e 8250      		subi r24,lo8(-(-2))
+ 533 0090 8430      		cpi r24,lo8(4)
+ 534 0092 00F4      		brsh .L31
+ 122:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****         time_off++;
+ 536               	.LM68:
+ 537 0094 8091 0000 		lds r24,time_off
+ 538 0098 9091 0000 		lds r25,time_off+1
+ 539 009c A091 0000 		lds r26,time_off+2
+ 540 00a0 B091 0000 		lds r27,time_off+3
+ 541 00a4 0196      		adiw r24,1
+ 542 00a6 A11D      		adc r26,__zero_reg__
+ 543 00a8 B11D      		adc r27,__zero_reg__
+ 544 00aa 8093 0000 		sts time_off,r24
+ 545 00ae 9093 0000 		sts time_off+1,r25
+ 546 00b2 A093 0000 		sts time_off+2,r26
+ 547 00b6 B093 0000 		sts time_off+3,r27
+ 548               	.L31:
+ 549               	/* epilogue start */
+ 123:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c ****     
+ 124:/Users/emil/Documents/Programme/Projects/AmbiLight/AmbiLight/AmbiLight/main.c **** }
+ 551               	.LM69:
+ 552 00ba BF91      		pop r27
+ 553 00bc AF91      		pop r26
+ 554 00be 9F91      		pop r25
+ 555 00c0 8F91      		pop r24
+ 556 00c2 0F90      		pop r0
+ 557 00c4 0FBE      		out __SREG__,r0
+ 558 00c6 0F90      		pop r0
+ 559 00c8 1F90      		pop r1
+ 560 00ca 1895      		reti
+ 562               	.Lscope3:
+ 563               	.global	switchPressed
+ 564               		.section .bss
+ 567               	switchPressed:
+ 568 0000 00        		.zero	1
+ 569               		.comm	state,1,1
+ 570               	.global	time_off
+ 573               	time_off:
+ 574 0001 0000 0000 		.zero	4
+ 575               	.global	time
+ 578               	time:
+ 579 0005 0000 0000 		.zero	4
+ 584               		.text
+ 586               	.Letext0:
+ 587               		.ident	"GCC: (GNU) 4.8.1"
+ 588               	.global __do_clear_bss
 DEFINED SYMBOLS
                             *ABS*:00000000 main.c
-/var/folders/n0/nrv0hhms1cx0j69_hx06fj7r0000gn/T//ccpvguCa.s:2      *ABS*:0000003e __SP_H__
-/var/folders/n0/nrv0hhms1cx0j69_hx06fj7r0000gn/T//ccpvguCa.s:3      *ABS*:0000003d __SP_L__
-/var/folders/n0/nrv0hhms1cx0j69_hx06fj7r0000gn/T//ccpvguCa.s:4      *ABS*:0000003f __SREG__
-/var/folders/n0/nrv0hhms1cx0j69_hx06fj7r0000gn/T//ccpvguCa.s:5      *ABS*:00000000 __tmp_reg__
-/var/folders/n0/nrv0hhms1cx0j69_hx06fj7r0000gn/T//ccpvguCa.s:6      *ABS*:00000001 __zero_reg__
-/var/folders/n0/nrv0hhms1cx0j69_hx06fj7r0000gn/T//ccpvguCa.s:113    .text:00000000 initIO
-/var/folders/n0/nrv0hhms1cx0j69_hx06fj7r0000gn/T//ccpvguCa.s:802    .bss:00000009 led_active
-/var/folders/n0/nrv0hhms1cx0j69_hx06fj7r0000gn/T//ccpvguCa.s:796    .data:00000005 led1
-/var/folders/n0/nrv0hhms1cx0j69_hx06fj7r0000gn/T//ccpvguCa.s:791    .data:00000004 led2
-/var/folders/n0/nrv0hhms1cx0j69_hx06fj7r0000gn/T//ccpvguCa.s:786    .data:00000003 led3
-/var/folders/n0/nrv0hhms1cx0j69_hx06fj7r0000gn/T//ccpvguCa.s:781    .data:00000002 led4
-/var/folders/n0/nrv0hhms1cx0j69_hx06fj7r0000gn/T//ccpvguCa.s:771    .data:00000000 out
-/var/folders/n0/nrv0hhms1cx0j69_hx06fj7r0000gn/T//ccpvguCa.s:776    .data:00000001 taster
+/var/folders/n0/nrv0hhms1cx0j69_hx06fj7r0000gn/T//cc2HtRgj.s:2      *ABS*:0000003e __SP_H__
+/var/folders/n0/nrv0hhms1cx0j69_hx06fj7r0000gn/T//cc2HtRgj.s:3      *ABS*:0000003d __SP_L__
+/var/folders/n0/nrv0hhms1cx0j69_hx06fj7r0000gn/T//cc2HtRgj.s:4      *ABS*:0000003f __SREG__
+/var/folders/n0/nrv0hhms1cx0j69_hx06fj7r0000gn/T//cc2HtRgj.s:5      *ABS*:00000000 __tmp_reg__
+/var/folders/n0/nrv0hhms1cx0j69_hx06fj7r0000gn/T//cc2HtRgj.s:6      *ABS*:00000001 __zero_reg__
+/var/folders/n0/nrv0hhms1cx0j69_hx06fj7r0000gn/T//cc2HtRgj.s:113    .text:00000000 initIO
                             *COM*:00000001 state
-/var/folders/n0/nrv0hhms1cx0j69_hx06fj7r0000gn/T//ccpvguCa.s:264    .text.startup:00000000 main
-/var/folders/n0/nrv0hhms1cx0j69_hx06fj7r0000gn/T//ccpvguCa.s:754    .bss:00000000 switchPressed
-/var/folders/n0/nrv0hhms1cx0j69_hx06fj7r0000gn/T//ccpvguCa.s:765    .bss:00000005 time
-/var/folders/n0/nrv0hhms1cx0j69_hx06fj7r0000gn/T//ccpvguCa.s:760    .bss:00000001 time_off
-/var/folders/n0/nrv0hhms1cx0j69_hx06fj7r0000gn/T//ccpvguCa.s:680    .text:000000cc __vector_16
+/var/folders/n0/nrv0hhms1cx0j69_hx06fj7r0000gn/T//cc2HtRgj.s:192    .text.startup:00000000 main
+/var/folders/n0/nrv0hhms1cx0j69_hx06fj7r0000gn/T//cc2HtRgj.s:567    .bss:00000000 switchPressed
+/var/folders/n0/nrv0hhms1cx0j69_hx06fj7r0000gn/T//cc2HtRgj.s:578    .bss:00000005 time
+/var/folders/n0/nrv0hhms1cx0j69_hx06fj7r0000gn/T//cc2HtRgj.s:573    .bss:00000001 time_off
+/var/folders/n0/nrv0hhms1cx0j69_hx06fj7r0000gn/T//cc2HtRgj.s:493    .text:0000004a __vector_16
 
 UNDEFINED SYMBOLS
 __udivmodsi4
-__do_copy_data
 __do_clear_bss
