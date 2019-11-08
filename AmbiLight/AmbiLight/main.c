@@ -20,6 +20,8 @@ enum States state;
 uint8_t switchPressed = 0;
 
 void initIO(void) {
+    cli();
+    
     DDRB |= (1<<PB0 | 1<<PB1 | 1<<PB2 | 1<<PB3 | 1<<PB4);
     DDRD |= (1<<PD3);
     PORTD |= (1<<PD2);
