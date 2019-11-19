@@ -17,7 +17,7 @@ enum State {
   T2
 };
 
-enum State state = OFF;
+enum State state = ON;
 
 unsigned long t1 = 0;
 
@@ -33,7 +33,7 @@ void setup() {
 }
 
 void releasedISR() {
-  if ((timer < 500) && (timer > 50)) {
+  if ((timer < 512) && (timer > 64)) {
     switch(state) {
       case OFF: state = ON; break;
       case ON: state = T1; break;
@@ -52,8 +52,8 @@ void loop() {
     timer++;
   }
 
-  while (digitalRead(taster) == 0 && timer > 500) {
-    delay(7);
+  while (digitalRead(taster) == 0 && timer >= 512) {
+    delay(10);
     pwm--;
     analogWrite(out, pwm);
   }
