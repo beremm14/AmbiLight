@@ -6,6 +6,7 @@ uint8_t led2 = 9;
 uint8_t led3 = 11;
 uint8_t led4 = 12;
 
+uint8_t on = 1;
 uint8_t pwm = 255;
 
 uint32_t timer = 0;
@@ -45,7 +46,11 @@ void releasedISR() {
 }
 
 void loop() {
-  analogWrite(out, pwm);
+  if(on) {
+    analogWrite(out, pwm);
+  } else {
+    analogWrite(out, 0);
+  }
 
   if (digitalRead(taster) == 0) {
     delay(1);
@@ -60,16 +65,14 @@ void loop() {
 
   switch(state) {
     case OFF:
-      pwm = 0;
+      on = 0;
       t1 = 0;
       digitalWrite(led1, LOW);
       digitalWrite(led2, LOW);
       digitalWrite(led3, LOW);
       break;
     case ON:
-      if (pwm == 0) {
-        pwm = 255;
-      }
+      on = 1;
       t1 = 0;
       digitalWrite(led1, HIGH);
       digitalWrite(led2, LOW);
