@@ -93,14 +93,14 @@ void loop() {
 
 //Sleep Timer
   switch(state) {
-case OFF:
+    case OFF:
       t1 = 0;
       digitalWrite(led1, LOW);
       digitalWrite(led2, LOW);
       digitalWrite(led3, LOW);
       digitalWrite(led4, LOW);
       break;
-case ON:
+    case ON:
       writeRGB();   
       t1 = 0;
       digitalWrite(led1, HIGH);
@@ -108,7 +108,7 @@ case ON:
       digitalWrite(led3, HIGH);
       digitalWrite(led4, HIGH);    
       break;
-case T1:
+    case T1:
       if (t1 == 0) {
         t1 = millis();
       }
@@ -121,7 +121,7 @@ case T1:
       digitalWrite(led3, LOW);
       digitalWrite(led4, LOW); 
       break;
-case T2:
+    case T2:
       if (t1 == 0) {
         t1 = millis();
       }
@@ -134,7 +134,7 @@ case T2:
       digitalWrite(led3, LOW);
       digitalWrite(led4, LOW); 
       break;
- case T3:
+    case T3:
       if (t1 == 0) {
         t1 = millis();
       }
@@ -147,7 +147,7 @@ case T2:
       digitalWrite(led3, HIGH);
       digitalWrite(led4, LOW); 
       break;
-case T4:
+    case T4:
       if (t1 == 0) {
         t1 = millis();
       }
