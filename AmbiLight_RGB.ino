@@ -85,6 +85,11 @@ void writeRGB()
 
 void loop() {
 
+    if (digitalRead(taster_timer) == 0) {
+    delay(1);
+    timer++;
+  }
+
 
 //Sleep Timer
   switch(state) {
