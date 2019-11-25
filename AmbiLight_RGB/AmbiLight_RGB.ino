@@ -16,11 +16,9 @@ uint8_t pwm_G = 0;
 uint8_t pwm_B = 0;
 uint32_t timer = 0;
 
-//TODO Make Preprogrammed warm white button
-//TODO Presets
-//TODO Effekte (Farbverlauf
+//TODO Effekte (Farbverlauf, blinken)
 
-enum State 
+enum Timer_State 
 {
   OFF,
   ON,
@@ -30,7 +28,18 @@ enum State
   T4
 };
 
-enum State state = ON;
+enum Mode_State
+{
+  Manual,
+  Warm_white,
+  Cool_red,
+  Cool_green,
+  Cool_blue,
+  Cool_turqoise
+};
+
+enum Timer_State timer_state = ON;
+enum Mode_State mode_state = Manual;
 
 unsigned long t1 = 0;
 
@@ -48,31 +57,59 @@ void setup() {
   pinMode(Poti_G, INPUT);
   pinMode(Poti_B, INPUT);
 
-  attachInterrupt(digitalPinToInterrupt(taster_timer), releasedISR, RISING);
-  attachInterrupt(digitalPinToInterrupt(taster_mode), releasedISR, RISING);
+  attachInterrupt(digitalPinToInterrupt(taster_timer), timerButtonPress, RISING);
+  attachInterrupt(digitalPinToInterrupt(taster_mode), modeButtonPress, RISING);
   analogReference(EXTERNAL);
 }
 //Switch Timer state
-void releasedISR() {
+void timerButtonPress() {
   if ((timer < 500) && (timer > 50)) {
-    switch(state) {
-      case OFF: state = ON; break;
-      case ON: state = T1; break;
-      case T1: state = T2; break;
-      case T2: state = T3; break;
-      case T3: state = T4; break;
-      case T4: state = OFF; break;
+    switch(timer_state) {
+      case OFF: timer_state = ON; break;
+      case ON: timer_state = T1; break;
+      case T1: timer_state = T2; break;
+      case T2: timer_state = T3; break;
+      case T3: timer_state = T4; break;
+      case T4: timer_state = OFF; break;
     }
   }
   timer = 0;
 }
 
-void writeRGB()
+//Switch Mode
+void modeButtonPress()
 {
-  //Read Poti values and set analog out
-    int val_R = analogRead(Poti_R);
-    int val_G = analogRead(Poti_G);
-    int val_B = analogRead(Poti_B);
+   if ((timer < 500) && (timer > 50)) {
+    switch(mode_state) {
+      case Manual: mode_state = Warm_white; break;
+      case Warm_white: mode_state = Cool_red; break;
+      case Cool_red: mode_state = Cool_green; break;
+      case Cool_green: mode_state = Cool_blue; break;
+      case Cool_blue: mode_state = Cool_turqoise; break;
+      case Cool_turqoise: mode_state = Manual; break;
+    }
+  }
+  timer = 0;
+  
+}
+
+
+void checkReset()
+{
+  if (digitalRead(taster_timer) && digitalRead(taster_mode))
+  {
+    if((timer < 500) && (timer > 50))
+    {
+      mode_state = Manual;
+      timer_state = ON;
+    }
+  }
+  timer = 0;
+}
+
+void writeRGB(int val_R, int val_G, int val_B)
+{
+  //Set PWM Signal
     pwm_R = map(val_R, 0, 1023, 0 , 255);
     pwm_G = map(val_G, 0, 1023, 0 , 255);
     pwm_B = map(val_B, 0, 1023, 0 , 255);
@@ -85,71 +122,88 @@ void writeRGB()
 
 void loop() {
 
+checkReset();
+
 
 //Sleep Timer
-  switch(state) {
-case OFF:
+  switch(timer_state) {
+  case OFF:
       t1 = 0;
       digitalWrite(led1, LOW);
       digitalWrite(led2, LOW);
       digitalWrite(led3, LOW);
       digitalWrite(led4, LOW);
       break;
-case ON:
-      writeRGB();   
+  case ON:
+      switch(mode_state)
+      {
+        case Manual:
+          writeRGB(analogRead(Poti_R), analogRead(Poti_G), analogRead(Poti_B)); break;
+        case Warm_white:
+          writeRGB(1023, 1023, 1023);  break;
+        case Cool_red:
+          writeRGB(1023, 0, 0);  break;
+        case Cool_green: 
+          writeRGB(0,1023,0); break;
+        case Cool_blue:
+          writeRGB(0,0,1023); break;
+        case Cool_turqoise:
+          writeRGB(0,1023, 1023); break;
+      }
+          
       t1 = 0;
       digitalWrite(led1, HIGH);
       digitalWrite(led2, HIGH);
       digitalWrite(led3, HIGH);
       digitalWrite(led4, HIGH);    
       break;
-case T1:
+  case T1:
       if (t1 == 0) {
         t1 = millis();
       }
       if (millis()-t1 > 10000) {
-        state = OFF;
+        timer_state = OFF;
       }
-      writeRGB();   
+      writeRGB(0,0,0);   
       digitalWrite(led1, HIGH);
       digitalWrite(led2, LOW);
       digitalWrite(led3, LOW);
       digitalWrite(led4, LOW); 
       break;
-case T2:
+  case T2:
       if (t1 == 0) {
         t1 = millis();
       }
       if (millis()-t1 > 20000) {
-        state = OFF;
+        timer_state = OFF;
       }
-      writeRGB();   
+      writeRGB(0,0,0);   
       digitalWrite(led1, HIGH);
       digitalWrite(led2, HIGH);
       digitalWrite(led3, LOW);
       digitalWrite(led4, LOW); 
       break;
- case T3:
+  case T3:
       if (t1 == 0) {
         t1 = millis();
       }
       if (millis()-t1 > 30000) {
-        state = OFF;
+        timer_state = OFF;
       }
-      writeRGB();   
+      writeRGB(0,0,0);   
       digitalWrite(led1, HIGH);
       digitalWrite(led2, HIGH);
       digitalWrite(led3, HIGH);
       digitalWrite(led4, LOW); 
       break;
-case T4:
+  case T4:
       if (t1 == 0) {
         t1 = millis();
       }
       if (millis()-t1 > 40000) {
-        state = OFF;
+        timer_state = OFF;
       }
-      writeRGB();   
+      writeRGB(0,0,0);   
       digitalWrite(led1, HIGH);
       digitalWrite(led2, HIGH);
       digitalWrite(led3, HIGH);
