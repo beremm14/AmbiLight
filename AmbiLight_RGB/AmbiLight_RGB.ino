@@ -18,6 +18,8 @@ uint32_t timer1 = 0;
 uint32_t timer2 = 0;
 uint32_t timer3 = 0;
 
+
+
 //TODO Effekte (Farbverlauf, blinken)
 
 enum Timer_State 
@@ -65,7 +67,7 @@ void setup() {
 }
 //Switch Timer state
 void timerButtonPress() {
-  if (timer1 > 50) {
+  if (timer1 > 100) {
     switch(timer_state) {
       case OFF: timer_state = ON; break;
       case ON: timer_state = T1; break;
@@ -81,7 +83,7 @@ void timerButtonPress() {
 //Switch Mode
 void modeButtonPress()
 {
-   if (timer2 > 50)) {
+   if (timer2 > 100) {
     switch(mode_state) {
       case Manual: mode_state = Warm_white; break;
       case Warm_white: mode_state = Cool_red; break;
@@ -98,9 +100,9 @@ void modeButtonPress()
 
 void checkReset()
 {
-  if (digitalRead(taster_timer) && digitalRead(taster_mode))
+  if (!digitalRead(taster_timer) && !digitalRead(taster_mode))
   {
-    if(timer3 > 50)
+    if(timer3 > 100)
     {
       mode_state = Manual;
       timer_state = ON;
@@ -136,7 +138,7 @@ void setTimer ()
     timer2 ++;
   }
 
-  if (digitalRead(taster_mode)&& digitalRead(taster_timer))
+  if (digitalRead(taster_mode) && digitalRead(taster_timer))
   {
     delay(1);
     timer3++;
@@ -145,12 +147,14 @@ void setTimer ()
 
 void loop() {
 
-checkReset();
 setTimer();
+checkReset();
+
 
 //Sleep Timer
   switch(timer_state) {
   case OFF:
+            writeRGB(0,0,0);   
       t1 = 0;
       digitalWrite(led1, LOW);
       digitalWrite(led2, LOW);
@@ -163,15 +167,15 @@ setTimer();
         case Manual:
           writeRGB(analogRead(Poti_R), analogRead(Poti_G), analogRead(Poti_B)); break;
         case Warm_white:
-          writeRGB(1023, 1023, 1023);  break;
+          writeRGB(623, 523, 50);  break;
         case Cool_red:
-          writeRGB(1023, 0, 0);  break;
+          writeRGB(255, 0, 0);  break;
         case Cool_green: 
-          writeRGB(0,1023,0); break;
+          writeRGB(0,255,0); break;
         case Cool_blue:
-          writeRGB(0,0,1023); break;
+          writeRGB(0,0,255); break;
         case Cool_turqoise:
-          writeRGB(0,1023, 1023); break;
+          writeRGB(0,255, 210); break;
       }
           
       t1 = 0;
@@ -186,8 +190,23 @@ setTimer();
       }
       if (millis()-t1 > 10000) {
         timer_state = OFF;
+        t1=0;
       }
-      writeRGB(0,0,0);   
+      switch(mode_state)
+      {
+        case Manual:
+          writeRGB(analogRead(Poti_R), analogRead(Poti_G), analogRead(Poti_B)); break;
+        case Warm_white:
+          writeRGB(623, 523, 50);  break;
+        case Cool_red:
+          writeRGB(255, 0, 0);  break;
+        case Cool_green: 
+          writeRGB(0,255,0); break;
+        case Cool_blue:
+          writeRGB(0,0,255); break;
+        case Cool_turqoise:
+          writeRGB(0,255, 210); break;
+      }
       digitalWrite(led1, HIGH);
       digitalWrite(led2, LOW);
       digitalWrite(led3, LOW);
@@ -197,10 +216,25 @@ setTimer();
       if (t1 == 0) {
         t1 = millis();
       }
-      if (millis()-t1 > 20000) {
-        timer_state = OFF;
+      if (millis()-t1 > 10000) {
+        timer_state = T1;
+        t1=0;
       }
-      writeRGB(0,0,0);   
+      switch(mode_state)
+      {
+        case Manual:
+          writeRGB(analogRead(Poti_R), analogRead(Poti_G), analogRead(Poti_B)); break;
+        case Warm_white:
+          writeRGB(623, 523, 50);  break;
+        case Cool_red:
+          writeRGB(255, 0, 0);  break;
+        case Cool_green: 
+          writeRGB(0,255,0); break;
+        case Cool_blue:
+          writeRGB(0,0,255); break;
+        case Cool_turqoise:
+          writeRGB(0,255, 210); break;
+      }
       digitalWrite(led1, HIGH);
       digitalWrite(led2, HIGH);
       digitalWrite(led3, LOW);
@@ -210,10 +244,25 @@ setTimer();
       if (t1 == 0) {
         t1 = millis();
       }
-      if (millis()-t1 > 30000) {
-        timer_state = OFF;
+      if (millis()-t1 > 10000) {
+        timer_state = T2;
+        t1=0;
       }
-      writeRGB(0,0,0);   
+      switch(mode_state)
+      {
+        case Manual:
+          writeRGB(analogRead(Poti_R), analogRead(Poti_G), analogRead(Poti_B)); break;
+        case Warm_white:
+          writeRGB(623, 523, 50);  break;
+        case Cool_red:
+          writeRGB(255, 0, 0);  break;
+        case Cool_green: 
+          writeRGB(0,255,0); break;
+        case Cool_blue:
+          writeRGB(0,0,255); break;
+        case Cool_turqoise:
+          writeRGB(0,255, 210); break;
+      }  
       digitalWrite(led1, HIGH);
       digitalWrite(led2, HIGH);
       digitalWrite(led3, HIGH);
@@ -223,10 +272,25 @@ setTimer();
       if (t1 == 0) {
         t1 = millis();
       }
-      if (millis()-t1 > 40000) {
-        timer_state = OFF;
+      if (millis()-t1 > 10000) {
+        timer_state = T3;
+        t1=0;
       }
-      writeRGB(0,0,0);   
+      switch(mode_state)
+      {
+        case Manual:
+          writeRGB(analogRead(Poti_R), analogRead(Poti_G), analogRead(Poti_B)); break;
+        case Warm_white:
+          writeRGB(623, 523, 50);  break;
+        case Cool_red:
+          writeRGB(255, 0, 0);  break;
+        case Cool_green: 
+          writeRGB(0,255,0); break;
+        case Cool_blue:
+          writeRGB(0,0,255); break;
+        case Cool_turqoise:
+          writeRGB(0,255, 210); break;
+      }  
       digitalWrite(led1, HIGH);
       digitalWrite(led2, HIGH);
       digitalWrite(led3, HIGH);
