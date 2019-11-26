@@ -14,7 +14,9 @@ uint8_t led4 = 8;
 uint8_t pwm_R = 0;
 uint8_t pwm_G = 0;
 uint8_t pwm_B = 0;
-uint32_t timer = 0;
+uint32_t timer1 = 0;
+uint32_t timer2 = 0;
+uint32_t timer3 = 0;
 
 //TODO Effekte (Farbverlauf, blinken)
 
@@ -63,7 +65,7 @@ void setup() {
 }
 //Switch Timer state
 void timerButtonPress() {
-  if ((timer < 500) && (timer > 50)) {
+  if (timer1 > 50) {
     switch(timer_state) {
       case OFF: timer_state = ON; break;
       case ON: timer_state = T1; break;
@@ -73,13 +75,13 @@ void timerButtonPress() {
       case T4: timer_state = OFF; break;
     }
   }
-  timer = 0;
+  timer1 = 0;
 }
 
 //Switch Mode
 void modeButtonPress()
 {
-   if ((timer < 500) && (timer > 50)) {
+   if (timer2 > 50)) {
     switch(mode_state) {
       case Manual: mode_state = Warm_white; break;
       case Warm_white: mode_state = Cool_red; break;
@@ -89,7 +91,7 @@ void modeButtonPress()
       case Cool_turqoise: mode_state = Manual; break;
     }
   }
-  timer = 0;
+  timer2 = 0;
   
 }
 
@@ -98,13 +100,13 @@ void checkReset()
 {
   if (digitalRead(taster_timer) && digitalRead(taster_mode))
   {
-    if((timer < 500) && (timer > 50))
+    if(timer3 > 50)
     {
       mode_state = Manual;
       timer_state = ON;
     }
   }
-  timer = 0;
+  timer3 = 0;
 }
 
 void writeRGB(int val_R, int val_G, int val_B)
@@ -120,10 +122,31 @@ void writeRGB(int val_R, int val_G, int val_B)
     analogWrite(B, pwm_B);
 }
 
+void setTimer ()
+{
+  if (digitalRead(taster_timer))
+  {
+    delay(1);
+    timer1 ++;
+  }
+
+  if (digitalRead(taster_mode))
+  {
+    delay(1);
+    timer2 ++;
+  }
+
+  if (digitalRead(taster_mode)&& digitalRead(taster_timer))
+  {
+    delay(1);
+    timer3++;
+  }
+}
+
 void loop() {
 
 checkReset();
-
+setTimer();
 
 //Sleep Timer
   switch(timer_state) {
